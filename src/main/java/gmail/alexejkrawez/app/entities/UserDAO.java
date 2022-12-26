@@ -23,6 +23,40 @@ public class UserDAO extends ConnectionDAO {
     private static final String SELECT_LOGIN = "SELECT true AS login FROM users WHERE login = ? LIMIT 1;";
 
 
+
+
+    private static final String SELECT_BY_LOGIN_PASSWORD_2 = "SELECT user_id, email, login, password, " +
+            "notes.id, notes.date, notes.target_date, notes.note, notes.file_path, notes.status " +
+            "FROM notes " +
+            "FROM notes INNER JOIN users" +
+            "ON notes.user_id = users.user_id" +
+            "WHERE notes.user_id = ? AND notes.status != 5" +
+            "ORDER BY notes.date;";
+
+//
+//
+//    Map<Long, Person> personsById = new HashMap<>();
+//while (rs.next()) {
+//        Long id = rs.getLong("id");
+//        String name = rs.getString("name");
+//        String email = rs.getString("email");
+//        Person person = personsById.get(id);
+//        if (person == null) {
+//            person = new Person(id, name);
+//            personsById.put(person.getId(), person);
+//        }
+//        person.addEmail(email);
+//    }
+//    Collection<Person> persons = personsById.values();
+
+
+
+
+
+
+
+
+
     synchronized public static int createUser(String email, String login, String password) {
         String validEmail = isEmailExist(email);
         String validLogin = isLoginExist(login);
