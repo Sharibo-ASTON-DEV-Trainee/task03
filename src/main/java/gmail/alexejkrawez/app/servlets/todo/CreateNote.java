@@ -7,7 +7,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.Charsets;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -69,13 +68,8 @@ public class CreateNote extends HttpServlet {
                     jsonObj = (JSONObject) JSONValue.parseWithException(item.getString(StandardCharsets.UTF_8.name()));
 
                     text = jsonObj.get("text").toString();
+                    text = JSONValue.escape(text);
                     status = jsonObj.get("status").toString();
-
-                    if (text.equals("")) {
-                        text = null;
-                    } else {
-                        text = text.replaceAll("\n", "#!");
-                    }
 
                     jsonObj.clear();
                 } else {
@@ -121,10 +115,10 @@ public class CreateNote extends HttpServlet {
 
     }
 
-    private String processUploadingFile(int user_id, FileItem item) throws Exception {
+    private String processUploadingFile(int userId, FileItem item) throws Exception {
 
         Path path = Paths.get(getServletContext().getRealPath(new StringBuilder().append(File.separator)
-                .append("usersFiles").append(File.separator).append(user_id).toString()));
+                .append("usersFiles").append(File.separator).append(userId).toString()));
 
         if (!path.toFile().exists()) {
             path.toFile().mkdirs();

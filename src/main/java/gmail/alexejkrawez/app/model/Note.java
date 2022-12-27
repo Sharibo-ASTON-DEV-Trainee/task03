@@ -2,29 +2,29 @@ package gmail.alexejkrawez.app.model;
 
 public class Note {
 
-    private int user_id;
+    private int userId;
     private int id;
     private String date;
-    private String target_date;
+    private String targetDate;
     private String note;
-    private String file_path;
+    private String filePath;
     private int status;
 
-    public Note(int user_id, int id, String date, String target_date, String note, String file_path, int status) {
-        this.user_id = user_id;
+    public Note(int userId, int id, String date, String targetDate, String note, String filePath, int status) {
+        this.userId = userId;
         this.id = id;
         this.date = date;
-        this.target_date = target_date;
+        this.targetDate = targetDate;
         this.note = note;
-        this.file_path = file_path;
+        this.filePath = filePath;
         this.status = status;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getId() {
@@ -41,11 +41,11 @@ public class Note {
         this.date = date;
     }
 
-    public String getTarget_date() {
-        return target_date;
+    public String getTargetDate() {
+        return targetDate;
     }
-    public void setTarget_date(String target_date) {
-        this.target_date = target_date;
+    public void setTargetDate(String targetDate) {
+        this.targetDate = targetDate;
     }
 
     public String getNote() {
@@ -55,11 +55,11 @@ public class Note {
         this.note = note;
     }
 
-    public String getFile_path() {
-        return file_path;
+    public String getFilePath() {
+        return filePath;
     }
-    public void setFile_path(String file_path) {
-        this.file_path = file_path;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public int getStatus() {
@@ -73,12 +73,12 @@ public class Note {
     @Override
     public String toString() {
         return "{" +
-                "\"user_id\":\"" + user_id + "\"" +
+                "\"user_id\":\"" + userId + "\"" +
                 ", \"id\":\"" + id + "\"" +
                 ", \"date\":\"" + date + "\"" +
-                ", \"target_date\":\"" + target_date + "\"" +
+                ", \"target_date\":\"" + targetDate + "\"" +
                 ", \"note\":\"" + note + "\"" +
-                ", \"file_path\":\"" + file_path + "\"" +
+                ", \"file_path\":\"" + filePath + "\"" +
                 ", \"status\":\"" + status + "\"" +
                 '}';
     }

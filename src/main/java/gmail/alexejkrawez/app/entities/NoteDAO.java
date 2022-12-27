@@ -69,10 +69,10 @@ public class NoteDAO extends ConnectionDAO {
             "ORDER BY id DESC LIMIT 1;";
 
 
-    synchronized public static boolean createNote(int user_id, String text, int status) {
+    synchronized public static boolean createNote(int userId, String text, int status) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(ADD_NOTE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setString(2, text);
             ps.setInt(3, status);
             ps.executeUpdate();
@@ -85,10 +85,10 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean createNoteWithFile(int user_id, String text, String filePath, int status) {
+    synchronized public static boolean createNoteWithFile(int userId, String text, String filePath, int status) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(ADD_NOTE_FILE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setString(2, text);
             ps.setString(3, filePath);
             ps.setInt(4, status);
@@ -102,32 +102,32 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static List<Note> getNotesOrderDate(int user_id) {
+    synchronized public static List<Note> getNotesOrderDate(int userId) {
         List<Note> notes = new ArrayList<>();
 
         try (PreparedStatement ps = getConnection().prepareStatement(SELECT_USER_NOTES_ORDER_DATE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
 
             ResultSet rs = ps.executeQuery();
             fillList(notes, rs);
         } catch (SQLException e) {
-            logger.error("user_id: " + user_id);
+            logger.error("user_id: " + userId);
             logger.error(e.getMessage(), e);
         }
 
         return notes;
     }
 
-    synchronized public static Note getLastNote(int user_id) {
+    synchronized public static Note getLastNote(int userId) {
         List<Note> notes = new ArrayList<>();
 
         try (PreparedStatement ps = getConnection().prepareStatement(SELECT_LAST_USER_NOTE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
 
             ResultSet rs = ps.executeQuery();
             fillList(notes, rs);
         } catch (SQLException e) {
-            logger.error("user_id: " + user_id);
+            logger.error("user_id: " + userId);
             logger.error(e.getMessage(), e);
         }
 
@@ -138,10 +138,10 @@ public class NoteDAO extends ConnectionDAO {
         return null;
     }
 
-    synchronized public static boolean setStatusOk(int user_id, int id) {
+    synchronized public static boolean setStatusOk(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_STATUS_OK)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setInt(2, id);
             ps.executeUpdate();
             logger.info("Note " + id + " status is ok.");
@@ -153,10 +153,10 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean setStatusInTrash(int user_id, int id) {
+    synchronized public static boolean setStatusInTrash(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_STATUS_IN_TRASH)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setInt(2, id);
             ps.executeUpdate();
             logger.info("Note " + id + " status is delete.");
@@ -168,10 +168,10 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean setStatusToday(int user_id, int id) {
+    synchronized public static boolean setStatusToday(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_STATUS_TODAY)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setInt(2, id);
             ps.executeUpdate();
             logger.info("Note " + id + " status is today.");
@@ -183,10 +183,10 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean DeleteNote(int user_id, int id) {
+    synchronized public static boolean DeleteNote(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(DELETE_NOTE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setInt(2, id);
             ps.executeUpdate();
             logger.info("With status 4 note " + id + " deleted.");
@@ -198,10 +198,10 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean DeleteNoteFile(int user_id, int id) {
+    synchronized public static boolean DeleteNoteFile(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_NOTE_FILE)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.setInt(2, id);
             ps.executeUpdate();
             logger.info("File in note " + id + " deleted.");
@@ -213,12 +213,12 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean deleteDeletedNotes(int user_id) {
+    synchronized public static boolean deleteDeletedNotes(int userId) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(DELETE_NOTES_STATUS_IN_TRASH)) {
-            ps.setInt(1, user_id);
+            ps.setInt(1, userId);
             ps.executeUpdate();
-            logger.info("All notes status 4 by user " + user_id + " deleted.");
+            logger.info("All notes status 4 by user " + userId + " deleted.");
             return true;
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
@@ -227,12 +227,12 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean updateStatusByDate(int user_id) {
+    synchronized public static boolean updateStatusByDate(int userId) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_STATUS_BY_DATE)) {
-            ps.setInt(1, user_id);
-            ps.setInt(2, user_id);
-            ps.setInt(3, user_id);
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+            ps.setInt(3, userId);
             ps.executeUpdate();
             logger.info("Status is updated.");
             return true;

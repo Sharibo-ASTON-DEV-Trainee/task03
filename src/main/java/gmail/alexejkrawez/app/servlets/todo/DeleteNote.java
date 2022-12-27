@@ -66,9 +66,9 @@ public class DeleteNote extends HttpServlet {
                 if (note.getId() == noteId) {
 
                     boolean fileStatus = true;
-                    if (note.getFile_path() != null) {
+                    if (note.getFilePath() != null) {
                         fileStatus = new File(System.getenv("CATALINA_HOME") + "/webapps/task03/usersFiles/" +
-                                File.separator + noteUserId + File.separator + note.getFile_path()).delete();
+                                File.separator + noteUserId + File.separator + note.getFilePath()).delete();
                     }
 
                     if (fileStatus) {
@@ -77,8 +77,8 @@ public class DeleteNote extends HttpServlet {
                     } else {
                         notes.remove(note);
 
-                        logger.error("File " + note.getFile_path() + "in note" + note.getId() +
-                                " by user " + note.getUser_id() + " is not delete!");
+                        logger.error("File " + note.getFilePath() + "in note" + note.getId() +
+                                " by user " + note.getUserId() + " is not delete!");
                         break;
                     }
                 }

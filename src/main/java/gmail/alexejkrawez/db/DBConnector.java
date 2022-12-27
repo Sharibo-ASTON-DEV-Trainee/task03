@@ -60,7 +60,8 @@ public class DBConnector {
 
     private static final String CREATE_UNIQUE_NOTES_ID_INDEX = "CREATE UNIQUE INDEX notes_id_uindex ON notes (id);";
 
-    private static final String DB_PATH = Thread.currentThread().getContextClassLoader().getResource("db.properties").getPath();
+    private static final String DB_PATH = Thread.currentThread().getContextClassLoader()
+            .getResource("db.properties").getPath();
 
     private final Properties dbProperties = new Properties();
 

@@ -1,29 +1,40 @@
 package gmail.alexejkrawez.app.model;
 
+import java.util.List;
+
 public class User {
-    private int user_id;
+    private int userId;
     private String email;
     private String login;
     private String password;
+//    private List<Note> userNotes;
 
     public User() {}
 
-    public User(int user_id) {
-        this.user_id = user_id;
+    public User(int userId) {
+        this.userId = userId;
     }
 
-    public User(int user_id, String email, String login, String password) {
-        this.user_id = user_id;
+//    public User(int userId, String email, String login, String password, List<Note> userNotes) {
+//        this.userId = userId;
+//        this.email = email;
+//        this.login = login;
+//        this.password = password;
+//        this.userNotes = userNotes;
+//    }
+
+    public User(int userId, String email, String login, String password) {
+        this.userId = userId;
         this.email = email;
         this.login = login;
         this.password = password;
     }
 
     public int getUserId() {
-        return user_id;
+        return userId;
     }
     public void setUserId(int user_id) {
-        this.user_id = user_id;
+        this.userId = user_id;
     }
 
     public String getEmail() {
@@ -50,7 +61,7 @@ public class User {
     @Override
     public String toString() {
         return "{" +
-                "\"user_id\":\"" + user_id + "\"" +
+                "\"user_id\":\"" + userId + "\"" +
                 ", \"email\":\"" + email + "\"" +
                 ", \"login\":\"" + login + "\"" +
                 ", \"password\":\"" + password + "\"" +

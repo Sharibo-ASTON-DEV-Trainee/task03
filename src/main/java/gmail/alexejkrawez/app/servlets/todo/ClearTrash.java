@@ -66,9 +66,9 @@ public class ClearTrash extends HttpServlet {
                 if (note.getStatus() == 4) {
 
                     boolean fileStatus = true;
-                    if (note.getFile_path() != null) {
+                    if (note.getFilePath() != null) {
                         fileStatus = new File(System.getenv("CATALINA_HOME") + "/webapps/task03/usersFiles/" +
-                                File.separator + noteUserId + File.separator + note.getFile_path()).delete();
+                                File.separator + noteUserId + File.separator + note.getFilePath()).delete();
                     }
 
                     if (fileStatus) {
@@ -76,7 +76,7 @@ public class ClearTrash extends HttpServlet {
                     } else {
                         notes.remove(note);
 
-                        logger.error("File " + note.getFile_path() + " by user " + note.getUser_id() + " is not delete!");
+                        logger.error("File " + note.getFilePath() + " by user " + note.getUserId() + " is not delete!");
                     }
                 }
 

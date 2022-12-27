@@ -126,7 +126,7 @@ public class UserDAO extends ConnectionDAO {
             ps.setString(3, password);
 
             ResultSet rs = ps.executeQuery();
-            fillList(usersList, rs);
+            fillList(usersList, rs);  //TODO это говно какое-то, убрать лист по возможности
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
@@ -144,7 +144,7 @@ public class UserDAO extends ConnectionDAO {
             String dbEmail = rs.getString("email");
             String dbLogin = rs.getString("login");
             String dbPassword = rs.getString("password");
-            User user = new User(dbUserId, dbEmail, dbLogin, dbPassword);
+            User user = new User(dbUserId, dbEmail, dbLogin, dbPassword); //TODO !!!!!!!!!!!!!!!!!!!
             usersList.add(user);
         }
     }

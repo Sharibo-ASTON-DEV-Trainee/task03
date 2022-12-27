@@ -136,7 +136,7 @@ function createMessage() {
             success: function (resp) {
                 console.log(resp);
                 let down = JSON.parse(resp);
-                console.log(down);
+                console.log(down); //TODO cut of!
                 if (down != null) {
                     $('#message_input').val('').focus();
                     document.getElementById("fileformlabel").innerText = '';
@@ -199,7 +199,7 @@ function createNoteBlock(note, index, list) {
 </div>`).appendTo('#up').slideDown();
 
     } else if (note.file_path == "null") {
-        note.note = note.note.replace(/#!/g, "<br/>");
+        note.note = note.note.replace(/\n/g, "<br/>");
 
         $(`<div class="note_container_1" id="${note.id}"><div class="note_container_2" id="${list}">
 <div class="note">${note.note}</div>
@@ -218,7 +218,7 @@ function createNoteBlock(note, index, list) {
 </div>`).appendTo('#up').slideDown();
 
     } else {
-        note.note = note.note.replace(/#!/g, "<br/>");
+        note.note = note.note.replace(/\n/g, "<br/>");
 
         $(`<div class="note_container_1" id="${note.id}"><div class="note_container_2" id="${list}">
 <div class="note">${note.note}
@@ -318,7 +318,7 @@ function setNoteStatusOk(index, list) {
     let up;
     let array_index;
     switch (list.toString()) {
-        case "1":
+        case "1": //TODO переписать форы на функцию
             for (let note of today_notes) {
                 if (note.id === index) {
                     array_index = today_notes.indexOf(note);
@@ -512,7 +512,7 @@ function deleteNoteFile(index, list) {
 
     $.ajax({
         url: "/task03/TODO/deleteFile",
-        type: "POST",
+        type: "POST", //TODO DELETE?
         data: up,
         dataType: 'JSON',
         success: function (resp) {
@@ -590,7 +590,7 @@ function clearTrashBin() {
     if (deleted_notes.length != 0) {
         $.ajax({
             url: "/task03/TODO/clearTrash",
-            type: "POST",
+            type: "POST", //TODO DELETE?
             data: JSON.stringify({ noteUserId: deleted_notes[0].user_id }),
             dataType: 'JSON',
             success: function (resp) {
@@ -637,7 +637,7 @@ function createTrashNoteBlock(note) {
 </div>`).appendTo('#deleted').slideDown();
 
     } else if (note.file_path == "null") {
-        note.note = note.note.replace(/#!/g, "<br/>");
+        note.note = note.note.replace(/\n/g, "<br/>");
 
         $(`<div class="note_container_1" id="${note.id}"><div class="note_container_2" id="4">
 <div class="note">${note.note}</div>
@@ -654,7 +654,7 @@ function createTrashNoteBlock(note) {
 </div>`).appendTo('#deleted').slideDown();
 
     } else {
-        note.note = note.note.replace(/#!/g, "<br/>");
+        note.note = note.note.replace(/\n/g, "<br/>");
 
         $(`<div class="note_container_1" id="${note.id}"><div class="note_container_2" id="4">
 <div class="note">${note.note}
@@ -741,7 +741,7 @@ function deleteNote(index) {
 
     $.ajax({
         url: "/task03/TODO/delete",
-        type: "POST",
+        type: "POST", //TODO DELETE?
         data: up,
         dataType: 'JSON',
         success: function (resp) {

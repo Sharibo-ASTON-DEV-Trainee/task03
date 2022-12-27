@@ -24,6 +24,7 @@ public class Registration extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
+
         StringBuilder sb = new StringBuilder();
         BufferedReader br = req.getReader();
         String str;
@@ -31,6 +32,7 @@ public class Registration extends HttpServlet {
         while ((str = br.readLine()) != null) {
             sb.append(str);
         }
+
 
         JSONObject jsonObj = new JSONObject();
         try {

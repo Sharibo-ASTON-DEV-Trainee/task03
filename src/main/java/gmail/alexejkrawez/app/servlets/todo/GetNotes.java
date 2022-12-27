@@ -2,6 +2,7 @@ package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.model.Note;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,7 +41,7 @@ public class GetNotes extends HttpServlet {
             }
         }
 
-        jsonObj.put("list", list.toString());
+        jsonObj.put("list", JSONValue.escape(list.toString()));
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
