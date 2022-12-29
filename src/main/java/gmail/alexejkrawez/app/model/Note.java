@@ -72,7 +72,7 @@ public class Note {
 
     @Override
     public String toString() {
-        return "{" +
+        return "\n{" +
                 "\"user_id\":\"" + userId + "\"" +
                 ", \"id\":\"" + id + "\"" +
                 ", \"date\":\"" + date + "\"" +
@@ -80,6 +80,6 @@ public class Note {
                 ", \"note\":\"" + note + "\"" +
                 ", \"file_path\":\"" + filePath + "\"" +
                 ", \"status\":\"" + status + "\"" +
-                '}';
+                "}";
     }
 }

@@ -81,6 +81,7 @@ public class Registration extends HttpServlet {
 
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
         try (PrintWriter writer = resp.getWriter()) {

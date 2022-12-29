@@ -1,6 +1,7 @@
 package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -27,7 +28,7 @@ public class GetNotes extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         Integer list = (Integer) session.getAttribute("list");
-        List<Note> notes = (List<Note>) session.getAttribute("notes");
+        List<Note> notes = ( (User) session.getAttribute("user") ).getUserNotes();
 
         JSONObject jsonObj = new JSONObject();
 
@@ -41,11 +42,12 @@ public class GetNotes extends HttpServlet {
             }
         }
 
-        jsonObj.put("list", JSONValue.escape(list.toString()));
+        jsonObj.put("list", list.toString());
+        resp.setStatus(HttpServletResponse.SC_OK);
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
-
+            logger.info("GetNotes response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

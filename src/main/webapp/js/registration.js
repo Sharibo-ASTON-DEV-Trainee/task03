@@ -1,3 +1,5 @@
+// servlet ValidEmail
+// Checks the login for validity.
 $("#email").change(function() {
     if ($('#email').val() != "") {
 
@@ -21,6 +23,8 @@ $("#email").change(function() {
     }
 });
 
+// servlet ValidLoginR
+// Checks the login for validity.
 $("#login").change(function() {
     if ($('#login').val() != "") {
 
@@ -46,6 +50,8 @@ $("#login").change(function() {
     }
 });
 
+// servlet ValidPassword
+// Checks the password for validity.
 $("#password").change(function() {
 
     if ($('#password').val() != "") {
@@ -70,6 +76,8 @@ $("#password").change(function() {
     }
 });
 
+// servlet ValidPassword
+// Checks the repeated password for validity.
 $("#password2").change(function() {
 
     if ($('#password2').val() != "") {
@@ -94,7 +102,8 @@ $("#password2").change(function() {
     }
 });
 
-
+// Mark fields red if they are invalid.
+// Otherwise, sends data to the server for registration.
 $('.form').submit(function(event) {
     event.preventDefault();
 
@@ -114,6 +123,8 @@ $('.form').submit(function(event) {
     }
 });
 
+// servlet Registration
+// Relocates to login.html.
 function submitForm() {
     let up = JSON.stringify({
 
@@ -130,6 +141,17 @@ function submitForm() {
         contentType: 'application/json',
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function(e) {
+                console.log("Server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("response received:"),
+        },
         success: function (resp) {
 
             switch (resp.resp) {
@@ -160,13 +182,14 @@ function submitForm() {
                         warn("Not valid password!");
                     } else if (!resp.passwordsEqual) {
                         warn("Passwords are not equivalent!");
-                    } //TODO можно сделать кейсами без брейков, а потом выделять все неправильные поля красным.
+                    } // TODO можно сделать кейсами без брейков, а потом выделять все неправильные поля красным.
             }
         }
     });
 
 }
 
+// Animates invalid information.
 function warn(text) {
     $('#warn').append(`${text}`).animate({opacity: "show", top: '45%'}, "slow");
     setTimeout(function() { $('#warn').animate({opacity: "hide", top: '55%'}, "fast").empty(); }, 2000);

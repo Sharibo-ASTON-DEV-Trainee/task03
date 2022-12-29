@@ -2,6 +2,7 @@ package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.entities.NoteDAO;
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -24,7 +25,7 @@ import static java.lang.Integer.parseInt;
 public class SetStatusInTrash extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
@@ -48,6 +49,7 @@ public class SetStatusInTrash extends HttpServlet {
             jsonObj.clear();
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
 
@@ -58,23 +60,26 @@ public class SetStatusInTrash extends HttpServlet {
 
         if (status) {
             HttpSession session = req.getSession(false);
-            List<Note> notes = (List<Note>) session.getAttribute("notes");
+            User user = (User) session.getAttribute("user");
 
-            for (Note note : notes) {
+            for (Note note : user.getUserNotes()) {
                 if (note.getId() == noteId) {
                     note.setStatus(4);
                     break;
                 }
             }
 
-            session.setAttribute("notes", notes);
+            session.setAttribute("user", user);
             jsonObj.put("status", true);
+            resp.setStatus(HttpServletResponse.SC_OK);
         } else {
             jsonObj.put("status", false);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("SetStatusInTrash response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

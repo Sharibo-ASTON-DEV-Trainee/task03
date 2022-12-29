@@ -140,7 +140,7 @@
 
 <!--    <servlet>-->
 <!--        <servlet-name>DeleteNoteFile</servlet-name>-->
-<!--        <servlet-class>gmail.alexejkrawez.app.servlets.todo.DeleteNoteFile</servlet-class>-->
+<!--        <servlet-class>gmail.alexejkrawez.app.servlets.todo.DeleteFile</servlet-class>-->
 <!--    </servlet>-->
 <!--    <servlet-mapping>-->
 <!--        <servlet-name>DeleteNoteFile</servlet-name>-->

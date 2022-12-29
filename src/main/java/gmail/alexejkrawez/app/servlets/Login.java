@@ -48,6 +48,7 @@ public class Login extends HttpServlet {
             jsonObj.clear();
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
         User user = UserDAO.getUser(login, password);
@@ -56,24 +57,25 @@ public class Login extends HttpServlet {
             jsonObj.put("user", false);
         } else {
             HttpSession session = req.getSession();
-            session.setAttribute("user", user);
             jsonObj.put("user", true);
             jsonObj.put("sessionId", session.getId());
 
-            boolean status = NoteDAO.updateStatusByDate(user.getUserId());
-
+            boolean status = NoteDAO.getNotesOrderDate(user);
             if (status) {
-                List<Note> notes = NoteDAO.getNotesOrderDate(user.getUserId());
-                session.setAttribute("notes", notes);
+                session.setAttribute("user", user);
                 session.setAttribute("list", 1);
+                resp.setStatus(HttpServletResponse.SC_OK);
+
+                logger.info("User into session: " + user);
             } else {
-                logger.warn("Notes update failed.");
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                logger.warn("Failure to receive notes.");
             }
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
-
+            logger.info("Login response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

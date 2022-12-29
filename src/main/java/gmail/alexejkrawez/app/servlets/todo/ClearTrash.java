@@ -2,6 +2,7 @@ package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.entities.NoteDAO;
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -27,7 +28,7 @@ import static java.lang.Integer.parseInt;
 public class ClearTrash extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
@@ -48,6 +49,7 @@ public class ClearTrash extends HttpServlet {
             jsonObj.clear();
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
 
@@ -57,8 +59,9 @@ public class ClearTrash extends HttpServlet {
 
         if (status) {
             HttpSession session = req.getSession(false);
-            List<Note> notes = (ArrayList<Note>) session.getAttribute("notes");
-            List<Note> notes2 = new ArrayList<Note>(notes);
+            User user = (User) session.getAttribute("user");
+            List<Note> notes = user.getUserNotes();
+            List<Note> notes2 = new ArrayList<>(notes);
 
             Iterator<Note> iter = notes2.iterator();
             while (iter.hasNext()) {
@@ -75,21 +78,26 @@ public class ClearTrash extends HttpServlet {
                         notes.remove(note);
                     } else {
                         notes.remove(note);
-
                         logger.error("File " + note.getFilePath() + " by user " + note.getUserId() + " is not delete!");
+                        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     }
                 }
 
             }
 
-            session.setAttribute("notes", notes2);
+            user.setUserNotes(notes2);
+            session.setAttribute("user", user);
             jsonObj.put("status", true);
+            resp.setStatus(HttpServletResponse.SC_OK);
+
         } else {
             jsonObj.put("status", false);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("ClearTrash response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

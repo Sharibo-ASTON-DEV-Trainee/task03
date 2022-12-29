@@ -2,6 +2,7 @@ package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.entities.NoteDAO;
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -24,7 +25,7 @@ import static java.lang.Integer.parseInt;
 public class SetStatusToday extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
@@ -48,6 +49,7 @@ public class SetStatusToday extends HttpServlet {
             jsonObj.clear();
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
 
@@ -58,7 +60,8 @@ public class SetStatusToday extends HttpServlet {
 
         if (status) {
             HttpSession session = req.getSession(false);
-            List<Note> notes = (List<Note>) session.getAttribute("notes");
+            User user = (User) session.getAttribute("user");
+            List<Note> notes = user.getUserNotes();
 
             for (Note note : notes) {
                 if (note.getId() == noteId) {
@@ -67,14 +70,16 @@ public class SetStatusToday extends HttpServlet {
                 }
             }
 
-            session.setAttribute("notes", notes);
+            session.setAttribute("user", user);
             jsonObj.put("status", true);
         } else {
             jsonObj.put("status", false);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("SetStatusToday response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

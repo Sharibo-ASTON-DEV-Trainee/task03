@@ -1,6 +1,7 @@
 package gmail.alexejkrawez.app.entities;
 
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -97,6 +98,28 @@ public class NoteDAO extends ConnectionDAO {
             return true;
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    synchronized public static boolean getNotesOrderDate(User user) {
+        List<Note> notes = new ArrayList<>();
+        boolean updateStatus = updateStatusByDate(user.getUserId());
+
+        if (updateStatus) {
+            try (PreparedStatement ps = getConnection().prepareStatement(SELECT_USER_NOTES_ORDER_DATE)) {
+                ps.setInt(1, user.getUserId());
+
+                ResultSet rs = ps.executeQuery();
+                fillList(notes, rs);
+                user.setUserNotes(notes);
+
+                return true;
+            } catch (SQLException e) {
+                logger.error("user_id: " + user.getUserId());
+                logger.error(e.getMessage(), e);
+            }
         }
 
         return false;

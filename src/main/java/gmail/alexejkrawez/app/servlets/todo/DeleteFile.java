@@ -2,6 +2,7 @@ package gmail.alexejkrawez.app.servlets.todo;
 
 import gmail.alexejkrawez.app.entities.NoteDAO;
 import gmail.alexejkrawez.app.model.Note;
+import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -16,16 +17,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import static gmail.alexejkrawez.app.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
 
 @WebServlet("/TODO/deleteFile")
-public class DeleteNoteFile extends HttpServlet {
+public class DeleteFile extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
@@ -48,6 +48,7 @@ public class DeleteNoteFile extends HttpServlet {
             jsonObj.clear();
         } catch (ParseException | NullPointerException e) {
             logger.error(e.getMessage(), e);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
 
@@ -55,59 +56,65 @@ public class DeleteNoteFile extends HttpServlet {
         int noteId = parseInt(reqId);
 
         HttpSession session = req.getSession(false);
-        List<Note> notes = (List<Note>) session.getAttribute("notes");
+        User user = (User) session.getAttribute("user");
 
         boolean status = false;
+        int position = -1;
 
-        for (Note note : notes) {
+        for (Note note : user.getUserNotes()) {
             if (note.getId() == noteId) {
-                if (note.getNote() != null) {
+                position = user.getUserNotes().indexOf(note);
+                if (JSONValue.parse(note.getNote()) != null) {
                     status = NoteDAO.DeleteNoteFile(noteUserId, noteId);
+                    break;
                 } else {
                     status = NoteDAO.DeleteNote(noteUserId, noteId);
+                    break;
                 }
             }
         }
 
         if (status) {
-            int index = -1;
 
-            for (Note note : notes) {
-                if (note.getId() == noteId) {
-                    index = notes.indexOf(note);
+            if (position > -1) {
+                Note note = user.getUserNotes().get(position);
 
-                    boolean fileStatus = true;
-                    if (note.getFilePath() != null) {
-                        fileStatus = new File(System.getenv("CATALINA_HOME") + "/webapps/task03/usersFiles/" +
-                                File.separator + noteUserId + File.separator + note.getFilePath()).delete();
-                    }
-
-                    if (fileStatus) {
-                        note.setFilePath(null);
-                        break;
-                    } else {
-                        note.setFilePath(null);
-
-                        logger.error("File " + note.getFilePath() + "in note" + note.getId() +
-                                " by user " + note.getUserId() + " is not delete!");
-                        break;
-                    }
+                boolean fileStatus = true;
+                if (note.getFilePath() != null) {
+                    fileStatus = new File(System.getenv("CATALINA_HOME") + "/webapps/task03/usersFiles/" +
+                            File.separator + noteUserId + File.separator + note.getFilePath())
+                            .delete();
                 }
 
+                if (fileStatus) {
+                    note.setFilePath(null);
+                } else {
+                    note.setFilePath(null);
+
+                    logger.error("File " + note.getFilePath() + " in note " + note.getId() +
+                            " by user " + note.getUserId() + " is not delete!");
+                }
+
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
-            if (notes.get(index).getNote() == null) {
-                notes.remove(notes.get(index));
+
+            if (user.getUserNotes().get(position).getNote() == null) {
+                user.getUserNotes().remove(user.getUserNotes().get(position));
             }
 
-            session.setAttribute("notes", notes);
+            session.setAttribute("user", user);
             jsonObj.put("status", true);
+            resp.setStatus(HttpServletResponse.SC_OK);
         } else {
             jsonObj.put("status", false);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("DeleteFile response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

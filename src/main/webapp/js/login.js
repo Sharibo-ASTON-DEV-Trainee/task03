@@ -1,3 +1,6 @@
+
+// servlet ValidLoginL
+// Checks the login for validity.
 $("#login").change(function() {
     if ($('#login').val() != "") {
 
@@ -19,7 +22,8 @@ $("#login").change(function() {
     }
 });
 
-
+// Mark fields red if they are invalid.
+// Otherwise, sends data to the server for login.
 $('.form').submit(function(event) {
     event.preventDefault();
 
@@ -33,7 +37,8 @@ $('.form').submit(function(event) {
     submitForm();
 });
 
-
+// servlet Login
+// Relocates to todo.html.
 function submitForm() {
     let up = JSON.stringify({
 
@@ -48,9 +53,19 @@ function submitForm() {
         contentType: 'application/json',
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function(e) {
+                console.log("Server error - " + e.status);
+                alert("Server error - " + e.status);
+            },
+            200: console.log("relocated to todo-page"),
+        },
         success: function (resp) {
             if (resp.user) {
-                console.log("success");
                 document.location.href = "../task03/todo.html";
             } else {
                 console.log("Wrong login or password!");
@@ -61,7 +76,7 @@ function submitForm() {
 
 }
 
-
+// Animates invalid information.
 function warn(text) {
     $('#warn').append(`${text}`).animate({opacity: "show", top: '45%'}, "slow");
     setTimeout(function() { $('#warn').animate({opacity: "hide", top: '55%'}, "fast").empty(); }, 2000);

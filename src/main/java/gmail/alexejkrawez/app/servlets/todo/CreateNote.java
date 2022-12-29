@@ -40,14 +40,13 @@ public class CreateNote extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         DiskFileItemFactory factory = new DiskFileItemFactory();
-
         factory.setSizeThreshold(1024 * 1024 * 2); // буфер данных в байтах
-
         File tempDir = new File("/webapp/");
         factory.setRepository(tempDir);
 
         ServletFileUpload upload = new ServletFileUpload(factory); // загрузчик
         upload.setSizeMax(1024 * 1024 * 10); // файл максимум 10Mb
+
 
         JSONObject jsonObj = new JSONObject();
         String text = null;
@@ -78,9 +77,9 @@ public class CreateNote extends HttpServlet {
             }
 
         } catch (FileUploadBase.SizeLimitExceededException e) {
-            //TODO сформировать запрос
-            return;
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             logger.error(e.getMessage(), e);
         }
 
@@ -92,21 +91,22 @@ public class CreateNote extends HttpServlet {
 
         if (down) {
             Note note = NoteDAO.getLastNote(user.getUserId());
-            if (note == null) {
-                jsonObj.put("note", null);
-            } else {
-                List<Note> notes = (List<Note>) session.getAttribute("notes");
-                notes.add(note);
-                session.setAttribute("notes", notes);
+            if (note != null) {
+                user.getUserNotes().add(note);
+                session.setAttribute("user", user);
                 jsonObj.put("note", note);
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
         } else {
-            jsonObj.put("note", null);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("CreateNote response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

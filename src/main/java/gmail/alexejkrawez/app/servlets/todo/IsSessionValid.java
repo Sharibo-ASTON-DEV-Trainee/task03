@@ -35,9 +35,11 @@ public class IsSessionValid extends HttpServlet {
                 session.invalidate();
 
                 logger.info("Session by user " + user.getUserId() + " is invalid.");
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
                 difference = -1L;
                 jsonObj.put("status", true);
+                resp.setStatus(HttpServletResponse.SC_OK);
             }
         } else {
             jsonObj.put("status", false);
@@ -46,7 +48,7 @@ public class IsSessionValid extends HttpServlet {
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
-
+            logger.info("IsSessionValid response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

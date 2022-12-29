@@ -25,23 +25,25 @@ public class CloseSession extends HttpServlet {
         JSONObject jsonObj = new JSONObject();
 
         HttpSession session = req.getSession(false);
-        User user = (User) session.getAttribute("user");
+        User user;
         if (session != null & req.isRequestedSessionIdValid()) {
+            user = (User) session.getAttribute("user");
             session.invalidate();
             jsonObj.put("status", true);
 
-            logger.info("Session by user " + user.getUserId() + " close.");
+            logger.info("Session by user " + user.getUserId() + " closed.");
         } else {
             jsonObj.put("status", true);
 
-            logger.warn("Session by user " + user.getUserId() + " close by invalidation.");
+            logger.warn("Session is already closed with invalidation.");
         }
 
         user = null;
+        resp.setStatus(HttpServletResponse.SC_OK);
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
-
+            logger.info("CloseSession response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

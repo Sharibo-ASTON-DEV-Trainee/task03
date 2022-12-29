@@ -7,7 +7,7 @@ public class User {
     private String email;
     private String login;
     private String password;
-//    private List<Note> userNotes;
+    private List<Note> userNotes;
 
     public User() {}
 
@@ -15,13 +15,13 @@ public class User {
         this.userId = userId;
     }
 
-//    public User(int userId, String email, String login, String password, List<Note> userNotes) {
-//        this.userId = userId;
-//        this.email = email;
-//        this.login = login;
-//        this.password = password;
-//        this.userNotes = userNotes;
-//    }
+    public User(int userId, String email, String login, String password, List<Note> userNotes) {
+        this.userId = userId;
+        this.email = email;
+        this.login = login;
+        this.password = password;
+        this.userNotes = userNotes;
+    }
 
     public User(int userId, String email, String login, String password) {
         this.userId = userId;
@@ -58,14 +58,24 @@ public class User {
         this.password = password;
     }
 
+    public List<Note> getUserNotes() {
+        return userNotes;
+    }
+
+    public void setUserNotes(List<Note> userNotes) {
+        this.userNotes = userNotes;
+    }
+
     @Override
     public String toString() {
-        return "{" +
+        return "\n{" +
                 "\"user_id\":\"" + userId + "\"" +
                 ", \"email\":\"" + email + "\"" +
                 ", \"login\":\"" + login + "\"" +
                 ", \"password\":\"" + password + "\"" +
-                '}';
+                ", \n" +
+                ", \"user_notes\":" + userNotes +
+                "}";
     }
 
 

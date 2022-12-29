@@ -1,3 +1,7 @@
+// 1 - today_notes list
+// 2 - tomorrow_notes list
+// 3 - someday_notes list
+// 4 - deleted_notes list
 let list = 1;
 
 let today_notes = [];
@@ -5,47 +9,64 @@ let tomorrow_notes = [];
 let someday_notes = [];
 let deleted_notes = [];
 
+// servlet IsSessionValid
+// If not - relocate to login.html.
 $.ajax({
     url: "/task03/TODO/session",
     type: "POST",
     contentType: 'application/json',
     dataType: 'JSON',
+    statusCode: {
+        401: function (e) {
+            console.log("user is unauthorized - " + e.status);
+            document.location.href = "../task03/login.html";
+        },
+        500: function (e) {
+            console.log("user is unauthorized - " + e.status);
+            document.location.href = "../task03/login.html";
+        },
+        200: console.log("authorization successful"),
+    },
     success: function (resp) {
         if (resp.status == true) {
-            console.log("success");
-        } else {
-            document.location.href = "../task03/login.html";
+            console.log("will download user's notes");
         }
     }
 });
 
-$('#up').ready(function() {
+// servlet GetNotes
+// Get all user notes and put them into javascript lists.
+// After that creates notes blocks.
+$('#up').ready(function () {
     $.ajax({
         url: "/task03/TODO/getNotes",
         type: "POST",
         contentType: 'application/json',
         dataType: 'JSON',
+        statusCode: {
+            500: function (e) {
+                console.log("error - " + e.status);
+            },
+            200: console.log("notes uploaded")
+        },
         success: function (resp) {
             list = resp.list;
 
             if (resp[0] != null) {
-                try {
-                    let i = 0;
-                    while (true) {
-                        if (resp[i].status == 1) {
-                            today_notes.push(resp[i]);
-                        } else if (resp[i].status == 2) {
-                            tomorrow_notes.push(resp[i]);
-                        } else if (resp[i].status == 3) {
-                            someday_notes.push(resp[i]);
-                        } else if (resp[i].status == 4) {
-                            deleted_notes.push(resp[i]);
-                        }
-
-                        i++;
+                let i = 0;
+                let j = Object.keys(resp).length - 1;
+                while (i < j) {
+                    if (resp[i].status == 1) {
+                        today_notes.push(resp[i]);
+                    } else if (resp[i].status == 2) {
+                        tomorrow_notes.push(resp[i]);
+                    } else if (resp[i].status == 3) {
+                        someday_notes.push(resp[i]);
+                    } else if (resp[i].status == 4) {
+                        deleted_notes.push(resp[i]);
                     }
-                } catch (e) {
-                    console.log(e);
+
+                    i++;
                 }
 
                 switch (list.toString()) {
@@ -83,6 +104,7 @@ $('#up').ready(function() {
     });
 });
 
+// Follows the keyboard shortcut control + enter.
 function SendComment(e) {
     e = e || window.event;
     if (e.keyCode == 13 && e.ctrlKey) {
@@ -90,12 +112,12 @@ function SendComment(e) {
     }
 }
 
-function getFileName (str) {
+// Gets the name of the file when it is selected by the user.
+function getFileName(str) {
     let i;
     if (str.lastIndexOf('\\')) {
         i = str.lastIndexOf('\\') + 1;
-    }
-    else {
+    } else {
         i = str.lastIndexOf('/') + 1;
     }
 
@@ -104,6 +126,8 @@ function getFileName (str) {
     uploaded.innerHTML = filename;
 }
 
+// servlet CreateNote
+// Writes a new note to the DBMS and, if successful, draws it.
 function createMessage() {
     const fd = new FormData();
 
@@ -112,7 +136,7 @@ function createMessage() {
         if (file.size <= 10485760) {
             fd.append("file", file, file.name);
         } else {
-            alert("A maximum file size is 10 MB!")
+            alert("A maximum file size is 10 Mb!")
             return;
         }
     }
@@ -133,10 +157,24 @@ function createMessage() {
             processData: false,
             contentType: false,
             timeout: 10000,
+            statusCode: {
+                400: function (e) {
+                    console.log("bad request - " + e.status);
+                    alert("bad request - " + e.status);
+                },
+                403: function (e) {
+                    console.log("server error - " + e.status);
+                    alert("File is over 10 Mb!" + e.status);
+                },
+                500: function (e) {
+                    console.log("server error - " + e.status);
+                    alert("server error - " + e.status);
+                },
+                201: console.log("note created"),
+            },
             success: function (resp) {
-                console.log(resp);
                 let down = JSON.parse(resp);
-                console.log(down); //TODO cut of!
+                console.log(down);
                 if (down != null) {
                     $('#message_input').val('').focus();
                     document.getElementById("fileformlabel").innerText = '';
@@ -158,7 +196,7 @@ function createMessage() {
 
                     console.log("success");
                 } else {
-                    console.log("fail"); //TODO пометить красным инпут?
+                    console.log("fail");
                 }
             }
         });
@@ -166,6 +204,7 @@ function createMessage() {
     }
 }
 
+// Draw a note block.
 function createNoteBlock(note, index, list) {
 
     if (note.note == "null") {
@@ -252,6 +291,7 @@ function createNoteBlock(note, index, list) {
 
 }
 
+// Changes the displayed notes to someday notes when user clicks on the "someday" button.
 function getSomedayNotes() {
     if (list != 3) {
         $('#up').find('.note_container_1').remove();
@@ -268,6 +308,7 @@ function getSomedayNotes() {
     }
 }
 
+// Changes the displayed notes to today notes when user clicks on the "today" button.
 function getTodayNotes() {
     if (list != 1) {
         $('#up').find('.note_container_1').remove();
@@ -284,6 +325,7 @@ function getTodayNotes() {
     }
 }
 
+// Changes the displayed notes to tomorrow notes when user clicks on the "tomorrow" button.
 function getTomorrowNotes() {
     if (list != 2) {
         $('#up').find('.note_container_1').remove();
@@ -300,29 +342,41 @@ function getTomorrowNotes() {
     }
 }
 
+// servlet SetList
+// Writes to the variable the value of the currently displayed list on the user's screen.
 function setList() {
     $.ajax({
-        url: "/task03/TODO/order",
-        type: "POST",
-        data: JSON.stringify({ list: list }),
+        url: "/task03/TODO/setList",
+        type: "PUT",
+        data: JSON.stringify({list: list}),
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            200: console.log("list updated"),
+        },
         success: function (resp) {
             if (resp.list) {
-                console.log("success");
+                console.log("list: " + list);
             }
         }
     });
 }
 
+// servlet SetStatusOk
+// Marks the note as completed (status 5 in DBMS). A note with this status will be stored
+// in the DBMS, but will no longer be displayed to the user.
 function setNoteStatusOk(index, list) {
     let up;
     let array_index;
     switch (list.toString()) {
-        case "1": //TODO переписать форы на функцию
+        case "1":
             for (let note of today_notes) {
                 if (note.id === index) {
                     array_index = today_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -334,7 +388,7 @@ function setNoteStatusOk(index, list) {
             for (let note of tomorrow_notes) {
                 if (note.id === index) {
                     array_index = tomorrow_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -346,7 +400,7 @@ function setNoteStatusOk(index, list) {
             for (let note of someday_notes) {
                 if (note.id === index) {
                     array_index = someday_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -357,13 +411,26 @@ function setNoteStatusOk(index, list) {
 
     $.ajax({
         url: "/task03/TODO/statusOk",
-        type: "POST",
+        type: "PUT",
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function (e) {
+                console.log("server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("note completed"),
+        },
         success: function (resp) {
             if (resp.status == true) {
-                $(`#up .note_container_1[id="${index}"]`).hide( "slow" );
-                setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).remove(); },600);
+                $(`#up .note_container_1[id="${index}"]`).hide("slow");
+                setTimeout(function () {
+                    $(`#up .note_container_1[id="${index}"]`).remove();
+                }, 600);
                 switch (list.toString()) {
                     case "1":
                         today_notes.splice(array_index, 1);
@@ -375,15 +442,16 @@ function setNoteStatusOk(index, list) {
                         someday_notes.splice(array_index, 1);
                 }
 
-                console.log("success");
             } else {
-                console.log("fail"); //TODO пометить красным инпут?
+                console.log("fail");
             }
         }
     });
 
 }
 
+// servlet SetStatusInTrash
+// Marks the note as deleted to trash (status 4 in DBMS).
 function putNoteInTrash(index, list) {
     let up;
     let array_index;
@@ -392,7 +460,7 @@ function putNoteInTrash(index, list) {
             for (let note of today_notes) {
                 if (note.id === index) {
                     array_index = today_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -404,7 +472,7 @@ function putNoteInTrash(index, list) {
             for (let note of tomorrow_notes) {
                 if (note.id === index) {
                     array_index = tomorrow_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -416,7 +484,7 @@ function putNoteInTrash(index, list) {
             for (let note of someday_notes) {
                 if (note.id === index) {
                     array_index = someday_notes.indexOf(note);
-                    up =  JSON.stringify({
+                    up = JSON.stringify({
                         noteUserId: note.user_id,
                         noteId: note.id
                     });
@@ -427,14 +495,27 @@ function putNoteInTrash(index, list) {
 
     $.ajax({
         url: "/task03/TODO/statusInTrash",
-        type: "POST",
+        type: "PUT",
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function (e) {
+                console.log("server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("note is in trash bin"),
+        },
         success: function (resp) {
             if (resp.status == true) {
                 let note;
-                $(`#up .note_container_1[id="${index}"]`).hide( "slow" );
-                setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).remove(); },600);
+                $(`#up .note_container_1[id="${index}"]`).hide("slow");
+                setTimeout(function () {
+                    $(`#up .note_container_1[id="${index}"]`).remove();
+                }, 600);
                 switch (list.toString()) {
                     case "1":
                         note = today_notes[array_index];
@@ -451,16 +532,16 @@ function putNoteInTrash(index, list) {
 
                 deleted_notes.push(note);
                 createTrashNoteBlock(note);
-
-                console.log("success");
             } else {
-                console.log("fail"); //TODO пометить красным инпут?
+                console.log("fail");
             }
         }
     });
 
 }
 
+// servlet DeleteNoteFile
+// Deletes a file attached to a note from DBMS and server.
 function deleteNoteFile(index, list) {
     let up;
     let array_index;
@@ -487,21 +568,21 @@ function deleteNoteFile(index, list) {
             }
         }
     } else if (list.toString() == "3") {
-            for (let note of someday_notes) {
-                if (note.id === index) {
-                    array_index = someday_notes.indexOf(note);
-                    up =  JSON.stringify({
-                        noteUserId: note.user_id,
-                        noteId: note.id
-                    });
-                    break;
-                }
+        for (let note of someday_notes) {
+            if (note.id === index) {
+                array_index = someday_notes.indexOf(note);
+                up = JSON.stringify({
+                    noteUserId: note.user_id,
+                    noteId: note.id
+                });
+                break;
             }
+        }
     } else {
         for (let note of deleted_notes) {
             if (note.id === index) {
                 array_index = deleted_notes.indexOf(note);
-                up =  JSON.stringify({
+                up = JSON.stringify({
                     noteUserId: note.user_id,
                     noteId: note.id
                 });
@@ -512,48 +593,75 @@ function deleteNoteFile(index, list) {
 
     $.ajax({
         url: "/task03/TODO/deleteFile",
-        type: "POST", //TODO DELETE?
+        type: "DELETE",
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function (e) {
+                console.log("server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("file deleted"),
+        },
         success: function (resp) {
             console.log(resp);
             if (resp.status == true) {
-                $(`.note_container_1[id="${index}"] .note_file_container`).hide( "slow" );
-                setTimeout(function() { $(`.note_container_1[id="${index}"] .note_file_container`).remove(); },600);
+                $(`.note_container_1[id="${index}"] .note_file_container`).hide("slow");
+                setTimeout(function () {
+                    $(`.note_container_1[id="${index}"] .note_file_container`).remove();
+                }, 600);
 
                 if (list.toString() == "1") {
-                    if (today_notes[array_index].note == "null") {
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).hide( "slow" ); },600);
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).remove(); },1200);
+                    if (today_notes[array_index].note === "") {
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).hide("slow");
+                        }, 600);
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).remove();
+                        }, 1200);
                         today_notes.splice(array_index, 1);
                     } else {
                         today_notes[array_index].file_path = "null";
                     }
 
                 } else if (list.toString() == "2") {
-                    if (tomorrow_notes[array_index].note == "null") {
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).hide( "slow" ); },600);
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).remove(); },1200);
+                    if (tomorrow_notes[array_index].note === "") {
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).hide("slow");
+                        }, 600);
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).remove();
+                        }, 1200);
                         tomorrow_notes.splice(array_index, 1);
                     } else {
                         tomorrow_notes[array_index].file_path = "null";
                     }
 
-                }
-                else if (list.toString() == "3") {
-                    if (someday_notes[array_index].note == "null") {
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).hide( "slow" ); },600);
-                        setTimeout(function() { $(`#up .note_container_1[id="${index}"]`).remove(); },1200);
+                } else if (list.toString() == "3") {
+                    if (someday_notes[array_index].note === "") {
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).hide("slow");
+                        }, 600);
+                        setTimeout(function () {
+                            $(`#up .note_container_1[id="${index}"]`).remove();
+                        }, 1200);
                         someday_notes.splice(array_index, 1);
                     } else {
                         someday_notes[array_index].file_path = "null";
                     }
 
-                }
-                else {
-                    if (deleted_notes[array_index].note == "null") {
-                        setTimeout(function() { $(`#deleted .note_container_1[id="${index}"]`).hide( "slow" ); },600);
-                        setTimeout(function() { $(`#deleted .note_container_1[id="${index}"]`).remove(); },1200);
+                } else {
+                    if (deleted_notes[array_index].note === "") {
+                        setTimeout(function () {
+                            $(`#deleted .note_container_1[id="${index}"]`).hide("slow");
+                        }, 600);
+                        setTimeout(function () {
+                            $(`#deleted .note_container_1[id="${index}"]`).remove();
+                        }, 1200);
                         deleted_notes.splice(array_index, 1);
                     } else {
                         deleted_notes[array_index].file_path = "null";
@@ -561,43 +669,61 @@ function deleteNoteFile(index, list) {
 
                 }
 
-                console.log("success");
             } else {
-                console.log("fail"); //TODO пометить красным инпут?
+                console.log("fail");
             }
         }
     });
 
 }
 
+// Shows a trash bin.
 function getTrashBin() {
     $('#deleted').find('.note_container_1').remove();
 
     $('#deleted_container').addClass('animate');
-    setTimeout(function() {
+    setTimeout(function () {
         for (let note of deleted_notes) {
             createTrashNoteBlock(note);
         }
     }, 600);
 }
 
+// Hides a trash bin.
 function closeTrashBin() {
     $('#deleted_container').removeClass('animate');
-    setTimeout(function() { $('#deleted').find('.note_container_1').remove(); },650);
+    setTimeout(function () {
+        $('#deleted').find('.note_container_1').remove();
+    }, 650);
 }
 
+// servlet clearTrash
+// Deletes notes with status 4 from DBMS.
 function clearTrashBin() {
     if (deleted_notes.length != 0) {
         $.ajax({
             url: "/task03/TODO/clearTrash",
-            type: "POST", //TODO DELETE?
-            data: JSON.stringify({ noteUserId: deleted_notes[0].user_id }),
+            type: "DELETE",
+            data: JSON.stringify({noteUserId: deleted_notes[0].user_id}),
             dataType: 'JSON',
+            statusCode: {
+                400: function (e) {
+                    console.log("bad request - " + e.status);
+                    alert("bad request - " + e.status);
+                },
+                500: function (e) {
+                    console.log("server error - " + e.status);
+                    alert("server error - " + e.status);
+                },
+                200: console.log("notes deleted successfully"),
+            },
             success: function (resp) {
                 console.log(resp);
                 if (resp.status == true) {
-                    $('#deleted').find('.note_container_1').hide( "slow" );
-                    setTimeout(function() { $('#deleted').find('.note_container_1').remove(); },600);
+                    $('#deleted').find('.note_container_1').hide("slow");
+                    setTimeout(function () {
+                        $('#deleted').find('.note_container_1').remove();
+                    }, 600);
                     deleted_notes.splice(0, deleted_notes.length);
                 }
             }
@@ -606,7 +732,7 @@ function clearTrashBin() {
 
 }
 
-
+// Draw a trash note block.
 function createTrashNoteBlock(note) {
     if (note.note == "null") {
         $(`<div class="note_container_1" id="${note.id}"><div class="note_container_2" id="4">
@@ -686,13 +812,16 @@ function createTrashNoteBlock(note) {
 
 }
 
+
+// servlet SetStatusToday
+// Marks the note as restored from the trash, assigns it the status of today (status 1 in DBMS).
 function extractNoteFromTrash(index) {
     let up;
     let array_index;
     for (let note of deleted_notes) {
         if (note.id === index) {
             array_index = deleted_notes.indexOf(note);
-            up =  JSON.stringify({
+            up = JSON.stringify({
                 noteUserId: note.user_id,
                 noteId: note.id
             });
@@ -702,13 +831,26 @@ function extractNoteFromTrash(index) {
 
     $.ajax({
         url: "/task03/TODO/statusToday",
-        type: "POST",
+        type: "PUT",
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function (e) {
+                console.log("server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("note restored successfully"),
+        },
         success: function (resp) {
             if (resp.status == true) {
-                $(`#deleted .note_container_1[id="${index}"]`).hide( "slow" );
-                setTimeout(function() { $(`#deleted .note_container_1[id="${index}"]`).remove(); },600);
+                $(`#deleted .note_container_1[id="${index}"]`).hide("slow");
+                setTimeout(function () {
+                    $(`#deleted .note_container_1[id="${index}"]`).remove();
+                }, 600);
                 let note = deleted_notes[array_index];
                 today_notes.push(note);
                 deleted_notes.splice(array_index, 1);
@@ -716,22 +858,23 @@ function extractNoteFromTrash(index) {
                     createNoteBlock(note, today_notes.indexOf(note), 1);
                 }
 
-                console.log("success");
             } else {
-                console.log("fail"); //TODO пометить красным инпут?
+                console.log("fail");
             }
         }
     });
 
 }
 
+// servlet DeleteNote
+// Deletes note from DBMS.
 function deleteNote(index) {
     let up;
     let array_index;
     for (let note of deleted_notes) {
         if (note.id === index) {
             array_index = deleted_notes.indexOf(note);
-            up =  JSON.stringify({
+            up = JSON.stringify({
                 noteUserId: note.user_id,
                 noteId: note.id
             });
@@ -741,32 +884,49 @@ function deleteNote(index) {
 
     $.ajax({
         url: "/task03/TODO/delete",
-        type: "POST", //TODO DELETE?
+        type: "DELETE",
         data: up,
         dataType: 'JSON',
+        statusCode: {
+            400: function (e) {
+                console.log("bad request - " + e.status);
+                alert("bad request - " + e.status);
+            },
+            500: function (e) {
+                console.log("server error - " + e.status);
+                alert("server error - " + e.status);
+            },
+            200: console.log("note deleted"),
+        },
         success: function (resp) {
             if (resp.status == true) {
-                $(`#deleted .note_container_1[id="${index}"]`).hide( "slow" );
-                setTimeout(function() { $(`#deleted .note_container_1[id="${index}"]`).remove(); },600);
+                $(`#deleted .note_container_1[id="${index}"]`).hide("slow");
+                setTimeout(function () {
+                    $(`#deleted .note_container_1[id="${index}"]`).remove();
+                }, 600);
                 deleted_notes.splice(array_index, 1);
 
-                console.log("success");
             } else {
-                console.log("fail"); //TODO пометить красным инпут?
+                console.log("fail");
             }
         }
     });
 
 }
 
+// servlet CloseSession
+// Destroys the user's session and redirects him to the login.html page
 function exit() {
     $.ajax({
         url: "/task03/TODO/exit",
         type: "POST",
         dataType: 'JSON',
+        statusCode: {
+            200: console.log("session closed")
+        },
         success: function (resp) {
             if (resp.status == true) {
-                console.log("success");
+                console.log("relocated to login-page");
                 document.location.href = "../task03/login.html";
             } else {
                 console.log("fail");
