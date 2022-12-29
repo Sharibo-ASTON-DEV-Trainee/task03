@@ -3,7 +3,6 @@ package gmail.alexejkrawez.app.servlets.todo;
 import gmail.alexejkrawez.app.model.Note;
 import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

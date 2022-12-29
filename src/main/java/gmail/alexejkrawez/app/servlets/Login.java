@@ -2,7 +2,6 @@ package gmail.alexejkrawez.app.servlets;
 
 import gmail.alexejkrawez.app.entities.NoteDAO;
 import gmail.alexejkrawez.app.entities.UserDAO;
-import gmail.alexejkrawez.app.model.Note;
 import gmail.alexejkrawez.app.model.User;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import static gmail.alexejkrawez.app.entities.ConnectionDAO.logger;
 

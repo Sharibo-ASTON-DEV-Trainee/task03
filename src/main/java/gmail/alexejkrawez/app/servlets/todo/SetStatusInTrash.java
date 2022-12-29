@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import static gmail.alexejkrawez.app.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
