@@ -81,10 +81,10 @@ public class DeleteFile extends HttpServlet {
             if (note.getId() == noteId) {
                 position = user.getUserNotes().indexOf(note);
                 if (JSONValue.parse(note.getNote()) != null) {
-                    status = NoteDAO.DeleteNoteFile(noteUserId, noteId);
+                    status = NoteDAO.deleteNoteFile(noteUserId, noteId);
                     break;
                 } else {
-                    status = NoteDAO.DeleteNote(noteUserId, noteId);
+                    status = NoteDAO.deleteNote(noteUserId, noteId);
                     break;
                 }
             }

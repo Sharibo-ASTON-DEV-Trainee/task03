@@ -74,7 +74,7 @@ public class DeleteNote extends HttpServlet {
         int noteUserId = parseInt(reqUserId);
         int noteId = parseInt(reqId);
 
-        boolean status = NoteDAO.DeleteNote(noteUserId, noteId);
+        boolean status = NoteDAO.deleteNote(noteUserId, noteId);
 
         if (status) {
             HttpSession session = req.getSession(false);

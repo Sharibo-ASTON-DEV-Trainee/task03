@@ -137,22 +137,6 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static List<Note> getNotesOrderDate(int userId) {
-        List<Note> notes = new ArrayList<>();
-
-        try (PreparedStatement ps = getConnection().prepareStatement(SELECT_USER_NOTES_ORDER_DATE)) {
-            ps.setInt(1, userId);
-
-            ResultSet rs = ps.executeQuery();
-            fillList(notes, rs);
-        } catch (SQLException e) {
-            logger.error("user_id: " + userId);
-            logger.error(e.getMessage(), e);
-        }
-
-        return notes;
-    }
-
     synchronized public static Note getLastNote(int userId) {
         List<Note> notes = new ArrayList<>();
 
@@ -218,7 +202,7 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean DeleteNote(int userId, int id) {
+    synchronized public static boolean deleteNote(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(DELETE_NOTE)) {
             ps.setInt(1, userId);
@@ -233,7 +217,7 @@ public class NoteDAO extends ConnectionDAO {
         return false;
     }
 
-    synchronized public static boolean DeleteNoteFile(int userId, int id) {
+    synchronized public static boolean deleteNoteFile(int userId, int id) {
 
         try (PreparedStatement ps = getConnection().prepareStatement(UPDATE_NOTE_FILE)) {
             ps.setInt(1, userId);

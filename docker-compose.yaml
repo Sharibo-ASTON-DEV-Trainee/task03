@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:latest
+    container_name: alexej_krawez_todo_db
+    volumes:
+      - ./src/main/resources/1_CREATE_USERS_TABLE.sql:/docker-entrypoint-initdb.d/1_CREATE_USERS_TABLE.sql
+      - ./src/main/resources/2_CREATE_NOTES_TABLE.sql:/docker-entrypoint-initdb.d/2_CREATE_NOTES_TABLE.sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: DbLocalRootPassword
+      MYSQL_DATABASE: alexej_krawez_todo_db
+      MYSQL_USER: deus
+      MYSQL_PASSWORD: exmachina
+    ports:
+      - "3306:3306"
+
+  tomcat:
+    depends_on:
+      - db
+    image: tomcat:9.0.70-jdk8-corretto
+    volumes:
+      - ./target/task03.war:/usr/local/tomcat/webapps/task03.war
+    ports:
+      - '8080:8080'
+    environment:
+      MYSQL_ROOT_PASSWORD: DbLocalRootPassword
+      MYSQL_DATABASE: alexej_krawez_todo_db
+      MYSQL_USER: deus
+      MYSQL_PASSWORD: exmachina
