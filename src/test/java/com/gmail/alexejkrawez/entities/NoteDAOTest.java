@@ -3,16 +3,21 @@ package com.gmail.alexejkrawez.entities;
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,25 +34,19 @@ class NoteDAOTest {
     private static final String FILL_DB_PATH = Thread.currentThread().getContextClassLoader()
             .getResource("4_FILL_DB.sql").getPath();
 
+    private String port = "3306";
 
     // will be shared between test methods
     @Container
     private static final MySQLContainer<?> MY_SQL_CONTAINER = new MySQLContainer<>("mysql:latest")
-            .withDatabaseName("test_alexej_krawez_todo_db")
+            .withDatabaseName("alexej_krawez_todo_db")
             .withUsername("deus")
             .withPassword("exmachina");
-//            .withInitScript(CREATE_USERS_TABLE_PATH)
-//            .withInitScript(CREATE_NOTES_TABLE_PATH)
-//            .withInitScript(FILL_DB_PATH);
 
+    private static final String DB_PROPERTIES_PATH = Thread.currentThread().getContextClassLoader()
+            .getResource("db.properties").getPath();
 
-    // will be started before and stopped after each test method
-//    @Container
-//    private MySQLContainer mysqlContainer = new MySQLContainer()
-//            .withDatabaseName("test_alexej_krawez_todo_db")
-//            .withUsername("deus")
-//            .withPassword("exmachina");
-
+    private final Properties dbProperties = new Properties();
 
     @BeforeAll
     public static void fillDB() {
@@ -57,14 +56,31 @@ class NoteDAOTest {
                 .withInitScript(FILL_DB_PATH);
     }
 
-    @Test
-    void test() {
-        assertTrue(MY_SQL_CONTAINER.isRunning());
-//        assertTrue(mysqlContainer.isRunning());
+
+    @BeforeEach
+    public void loadProperties() {
+        try {
+            dbProperties.load(new FileInputStream(DB_PROPERTIES_PATH));
+            Pattern pat = Pattern.compile("[0-9]{4,}");
+            Matcher mat = pat.matcher(MY_SQL_CONTAINER.getJdbcUrl());
+            if (mat.find() && !mat.group().equals(port)) {
+                String dbUrl = dbProperties.getProperty("url");
+                dbUrl = dbUrl.replace(port, mat.group());
+                dbProperties.setProperty("url", dbUrl);
+                dbProperties.store(new FileOutputStream(DB_PROPERTIES_PATH), null);
+                port = mat.group();
+            }
+
+        } catch (IOException e) {
+            ConnectionDAO.logger.error("Cannot load or save db.properties.");
+            ConnectionDAO.logger.error(e.getMessage(), e);
+        }
+
     }
 
 
     @Test
+    @Order(1)
     void getNotesOrderDate() {
         Note[] notesArray = {
                 new Note(2, 1, "2022-12-30 09:26:00", "2022-12-31 00:00:00",
@@ -96,6 +112,7 @@ class NoteDAOTest {
     }
 
     @Test
+    @Order(2)
     void getLastNote() {
         Note note = new Note(2, 7, "2022-12-30 11:01:28", "2022-12-31 00:00:00",
                 "anime: megalo box s03-06", "null", 2);
@@ -105,53 +122,62 @@ class NoteDAOTest {
     }
 
     @Test
+    @Order(3)
     void setStatusOk() {
         boolean dbStatus = NoteDAO.setStatusOk(3, 26);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(4)
     void setStatusInTrash() {
         boolean dbStatus = NoteDAO.setStatusInTrash(3, 21);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(5)
     void setStatusToday() {
         boolean dbStatus = NoteDAO.setStatusToday(3, 20);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(6)
     void deleteNote() {
         boolean dbStatus = NoteDAO.deleteNote(3, 19);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(7)
     void deleteNoteFile() {
         boolean dbStatus = NoteDAO.deleteNoteFile(3, 18);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(8)
     void deleteDeletedNotes() {
         boolean dbStatus = NoteDAO.deleteDeletedNotes(3);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(9)
     void updateStatusByDate() {
         boolean dbStatus = NoteDAO.updateStatusByDate(2);
         assertTrue(dbStatus);
     }
 
     @Test
+    @Order(10)
     void createNote() {
         boolean dbNote = NoteDAO.createNote(1, "Tomas is here!", 1);
         assertTrue(dbNote);
     }
 
+    @Order(11)
     @Test
     void createNoteWithFile() {
         boolean dbNote = NoteDAO.createNoteWithFile(1, "Tomas has the file!", "0000Tomas.gif", 1);

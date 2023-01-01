@@ -2,7 +2,7 @@
 
 <Configuration>
 	<Properties>
-		<Property name="logdir">${sys:catalina.base}/logs</Property>
+		<Property name="logdir">logs</Property>
 	</Properties>
 	<Appenders>
 		<RollingFile
