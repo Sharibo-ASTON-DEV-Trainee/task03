@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Configuration>
+	<Properties>
+		<Property name="logdir">${sys:catalina.base}/logs</Property>
+	</Properties>
 	<Appenders>
-		<RollingFile name="File" fileName="${catalina.base}/logs/task03.log" append="true">
-				<PatternLayout pattern="%d{ISO8601} [%-5p][%48.48c] - %m%n"/>
-<!--			<PatternLayout pattern="%d{ISO8601} [%-5p][%-16.16t][%32.32c] - %m%n"/>-->
+		<RollingFile
+				name="File"
+				fileName="${logdir}/task03.log"
+				filePattern="${logdir}/task03%d{dd-MM-yyyy}.%i.log"
+				append="true">
+			<PatternLayout pattern="%d{ISO8601} [%-5p][%48.48c] - %m%n"/>
 			<Policies>
-				<SizeBasedTriggeringPolicy size="100 MB"/>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
 			</Policies>
-			<DefaultRolloverStrategy max="10"/>
+			<DefaultRolloverStrategy max="5"/>
 		</RollingFile>
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{ISO8601} [%-5p][%48.48c] - %m%n"/>
-<!--			<PatternLayout pattern="%d{ISO8601} [%-5p][%-16.16t][%32.32c] - %m%n"/>-->
 		</Console>
 	</Appenders>
 	<Loggers>
-<!--		<Logger level="info">-->
-<!--			<AppenderRef ref="File"/>-->
-<!--			<AppenderRef ref="STDOUT"/>-->
-<!--		</Logger>-->
-		<Root level="info">
+		<Logger name="com.gmail.alexejkrawez" level="info">
 			<AppenderRef ref="File"/>
+		</Logger>
+		<Root level="info">
 			<AppenderRef ref="STDOUT"/>
 		</Root>
 	</Loggers>
