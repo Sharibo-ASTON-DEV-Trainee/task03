@@ -1,7 +1,8 @@
 package com.gmail.alexejkrawez.servlets.validation;
 
-import com.gmail.alexejkrawez.entities.ConnectionDAO;
 import com.gmail.alexejkrawez.entities.UserDAO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Web Servlet.
  * Validates user input against an email template. Also queries the DBMS
  * if the email exists.
  * Returns the user input's validity status and whether such an email exists
@@ -29,10 +29,15 @@ import java.io.PrintWriter;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/validation/email")
 public class ValidEmail extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(ValidEmail.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -58,11 +63,11 @@ public class ValidEmail extends HttpServlet {
             boolean valid = email.matches("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
             jsonObj.put("validation", valid);
         } catch (ParseException | NullPointerException e) {
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
-        String exists = UserDAO.isEmailExist(email);
-        if (exists != null) {
+        boolean exists = UserDAO.isEmailExist(email);
+        if (exists) {
             jsonObj.put("exists", true);
         } else {
             jsonObj.put("exists", false);
@@ -70,10 +75,11 @@ public class ValidEmail extends HttpServlet {
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("ValidEmail response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         } catch (Exception e) {
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
     }

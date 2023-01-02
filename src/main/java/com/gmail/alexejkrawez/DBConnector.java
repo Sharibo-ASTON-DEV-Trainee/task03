@@ -1,13 +1,11 @@
 package com.gmail.alexejkrawez;
 
-import com.gmail.alexejkrawez.entities.ConnectionDAO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.*;
 import java.util.Properties;
 
 /**
@@ -23,9 +21,14 @@ import java.util.Properties;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 public class DBConnector {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(DBConnector.class);
 
     private final static String DRIVER = "driver";
     private final static String URL = "url";
@@ -83,8 +86,8 @@ public class DBConnector {
         try {
             dbProperties.load(new FileInputStream(DB_PATH));
         } catch (IOException e) {
-            ConnectionDAO.logger.error("Cannot load db.properties.");
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error("Cannot load db.properties.");
+            logger.error(e.getMessage(), e);
         }
 
     }
@@ -111,7 +114,7 @@ public class DBConnector {
                           dbProperties.getProperty(PASSWORD));
 
             if (isDBExists()) {
-                ConnectionDAO.logger.info("The database has already been created.");
+                logger.info("The database has already been created.");
             } else {
                 try (Statement s = connection.createStatement();) {
                     s.executeUpdate(CREATE_DATABASE_1 + dbProperties.getProperty(DATABASE_NAME) + CREATE_DATABASE_2);
@@ -124,14 +127,14 @@ public class DBConnector {
                     s.executeUpdate(CREATE_NOTES_TABLE);
                     s.executeUpdate(CREATE_UNIQUE_NOTES_ID_INDEX);
 
-                    ConnectionDAO.logger.info("Database is created.");
+                    logger.info("Database is created.");
                 } catch (SQLException e) {
-                    ConnectionDAO.logger.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
             }
 
         } catch (SQLException e) {
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -139,9 +142,9 @@ public class DBConnector {
     private void registerDBDriver() {
         try {
             Class.forName(dbProperties.getProperty(DRIVER));
-            ConnectionDAO.logger.info("Loading driver success.");
+            logger.info("Loading driver success.");
         } catch (ClassNotFoundException e) {
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -169,8 +172,8 @@ public class DBConnector {
             }
 
         } catch (Exception e) {
-            ConnectionDAO.logger.error("isDBExists() has error.");
-            ConnectionDAO.logger.error(e.getMessage(), e);
+            logger.error("isDBExists() has error.");
+            logger.error(e.getMessage(), e);
         }
 
         return false;

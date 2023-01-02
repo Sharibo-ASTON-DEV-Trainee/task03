@@ -3,6 +3,8 @@ package com.gmail.alexejkrawez.servlets.todo;
 import com.gmail.alexejkrawez.entities.NoteDAO;
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -19,11 +21,9 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
 
 /**
- * Web Servlet.
  * Updates the note's current status in the DBMS to status 5 = completed.
  * Notes with this status are stored in the DBMS, but are never shown to the
  * client again. On success, also deletes the note in the
@@ -37,10 +37,15 @@ import static java.lang.Integer.parseInt;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/TODO/statusOk")
 public class SetStatusOk extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(SetStatusOk.class);
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

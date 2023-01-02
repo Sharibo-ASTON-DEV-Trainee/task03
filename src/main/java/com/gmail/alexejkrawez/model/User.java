@@ -1,6 +1,7 @@
 package com.gmail.alexejkrawez.model;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A POJO class that describes the users of the service.
@@ -12,7 +13,7 @@ import java.util.List;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 public class User {
     private int userId;
@@ -88,6 +89,29 @@ public class User {
                 ", \n" +
                 ", \"user_notes\":" + userNotes +
                 "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return userId == user.userId &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(login, user.login) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(userNotes, user.userNotes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                userId,
+                email,
+                login,
+                password,
+                userNotes
+        );
     }
 
 

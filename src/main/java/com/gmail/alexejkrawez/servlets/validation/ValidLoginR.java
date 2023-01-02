@@ -1,6 +1,8 @@
 package com.gmail.alexejkrawez.servlets.validation;
 
 import com.gmail.alexejkrawez.entities.UserDAO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -14,10 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
-
 /**
- * Web Servlet.
  * Validates user input against a regular expression. The length of the
  * login is also checked: at least 6 and no more than 30 characters.
  * Also queries the DBMS if such a login exists in the database.
@@ -32,10 +31,15 @@ import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/validation/login_r")
 public class ValidLoginR extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(ValidLoginR.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -83,8 +87,8 @@ public class ValidLoginR extends HttpServlet {
             jsonObj.put("length", false);
         }
 
-        String exists = UserDAO.isLoginExist(login);
-        if (exists != null) {
+        boolean exists = UserDAO.isLoginExist(login);
+        if (exists) {
             jsonObj.put("exists", true);
         } else {
             jsonObj.put("exists", false);
@@ -92,6 +96,7 @@ public class ValidLoginR extends HttpServlet {
 
         try (PrintWriter writer = resp.getWriter()) {
             jsonObj.writeJSONString(writer);
+            logger.info("ValidLoginR response: " + jsonObj);
         } catch (NullPointerException | IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {

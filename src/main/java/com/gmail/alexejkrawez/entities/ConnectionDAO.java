@@ -1,8 +1,6 @@
 package com.gmail.alexejkrawez.entities;
 
 import com.gmail.alexejkrawez.DBConnector;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 
@@ -17,14 +15,9 @@ import java.sql.Connection;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 public class ConnectionDAO {
-
-    /**
-     * Provides logging to the console and to a file.
-     */
-    public static final Logger logger = LogManager.getLogger(ConnectionDAO.class);
 
     /**
      * Gives a DBMS connection object.
@@ -33,5 +26,5 @@ public class ConnectionDAO {
      */
     static Connection getConnection() {
         return DBConnector.getInstance().getConnection();
-    } // TODO насчёт статика не уверен
+    }
 }

@@ -2,6 +2,8 @@ package com.gmail.alexejkrawez.entities;
 
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,9 +21,14 @@ import java.util.List;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 public class NoteDAO extends ConnectionDAO {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(NoteDAO.class);
 
     private static final String ADD_NOTE = "INSERT INTO notes (user_id, note, status, target_date) " +
         "VALUES (?, ?, ?, CASE " +

@@ -10,7 +10,7 @@
 				fileName="${logdir}/task03.log"
 				filePattern="${logdir}/task03%d{dd-MM-yyyy}.%i.log"
 				append="true">
-			<PatternLayout pattern="%d{ISO8601} [%-5p][%48.48c] - %m%n"/>
+			<PatternLayout pattern="%d{dd/MM/yyyy HH:mm:ss,SSS} %-5p[%c{1}] line:%L - %m%n"/>
 			<Policies>
 				<OnStartupTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="100 MB" />
@@ -18,7 +18,7 @@
 			<DefaultRolloverStrategy max="5"/>
 		</RollingFile>
 		<Console name="STDOUT" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{ISO8601} [%-5p][%48.48c] - %m%n"/>
+			<PatternLayout pattern="%d{dd/MM/yyyy HH:mm:ss,SSS} %-5p[%c{1}] - %m%n"/>
 		</Console>
 	</Appenders>
 	<Loggers>

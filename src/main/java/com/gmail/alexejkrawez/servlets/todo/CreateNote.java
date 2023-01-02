@@ -7,6 +7,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -25,11 +27,9 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
 
 /**
- * Web Servlet.
  * A new note that came in the request is written to the database.
  * If the note contains an attached file, initializes its download.
  * The file is downloaded to the directory: userFiles/user_id/ .
@@ -46,10 +46,15 @@ import static java.lang.Integer.parseInt;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/TODO/message")
 public class CreateNote extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(CreateNote.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

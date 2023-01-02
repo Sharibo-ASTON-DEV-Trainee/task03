@@ -3,6 +3,8 @@ package com.gmail.alexejkrawez.servlets.todo;
 import com.gmail.alexejkrawez.entities.NoteDAO;
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -18,11 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
 
 /**
- * Web Servlet.
  * Deletes the file related to a particular note from the DBMS. If successful,
  * it also finds this note in the User object stored in the session
  * and sets the value of the filePath field to null.
@@ -35,10 +35,15 @@ import static java.lang.Integer.parseInt;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/TODO/deleteFile")
 public class DeleteFile extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(DeleteFile.class);
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

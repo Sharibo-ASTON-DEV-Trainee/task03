@@ -1,5 +1,7 @@
 package com.gmail.alexejkrawez.model;
 
+import java.util.Objects;
+
 /**
  * POJO class describing the user's todu-notes.
  *
@@ -10,7 +12,7 @@ package com.gmail.alexejkrawez.model;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 public class Note {
 
@@ -94,4 +96,33 @@ public class Note {
                 ", \"status\":\"" + status + "\"" +
                 "}";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Note)) return false;
+        Note note1 = (Note) o;
+        return userId == note1.userId &&
+                id == note1.id &&
+                status == note1.status &&
+                date.equals(note1.date) &&
+                targetDate.equals(note1.targetDate) &&
+                Objects.equals(note, note1.note) &&
+                Objects.equals(filePath, note1.filePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                userId,
+                id,
+                date,
+                targetDate,
+                note,
+                filePath,
+                status
+        );
+    }
+
+
 }

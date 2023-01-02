@@ -2,6 +2,8 @@ package com.gmail.alexejkrawez.servlets.todo;
 
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import javax.servlet.ServletException;
@@ -14,10 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
-
 /**
- * Web Servlet.
  * Calls the User object stored in the session and gets a list of notes.
  * Returns a list of notes.
  *
@@ -28,10 +27,15 @@ import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/TODO/getNotes")
 public class GetNotes extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(GetNotes.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

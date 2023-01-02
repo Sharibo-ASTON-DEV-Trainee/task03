@@ -3,6 +3,8 @@ package com.gmail.alexejkrawez.servlets;
 import com.gmail.alexejkrawez.entities.NoteDAO;
 import com.gmail.alexejkrawez.entities.UserDAO;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -17,10 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
-
 /**
- * Web Servlet.
  * Requests a user from the DBMS by login and password. If the data
  * from the DBMS is successfully received, it creates a session for
  * the given user. It also makes a request to the DBMS to get the notes
@@ -38,10 +37,15 @@ import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/login")
 public class Login extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(Login.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -70,7 +74,7 @@ public class Login extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
-        User user = UserDAO.getUser(login, password);
+        User user = UserDAO.selectByLoginPassword(login, password);
 
         if (user == null) {
             jsonObj.put("user", false);

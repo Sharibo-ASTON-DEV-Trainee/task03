@@ -3,6 +3,8 @@ package com.gmail.alexejkrawez.servlets.todo;
 import com.gmail.alexejkrawez.entities.NoteDAO;
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -17,11 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static com.gmail.alexejkrawez.entities.ConnectionDAO.logger;
 import static java.lang.Integer.parseInt;
 
 /**
- * Web Servlet.
  * Updates the current status of the note in the DBMS to status
  * 4 = located in the trash. On success, also updates the status of the
  * note in the list of notes in the User object stored in the session.
@@ -34,10 +34,15 @@ import static java.lang.Integer.parseInt;
  * @since Java v1.8
  *
  * @author Alexej Krawez
- * @version 1.0
+ * @version 1.1
  */
 @WebServlet("/TODO/statusInTrash")
 public class SetStatusInTrash extends HttpServlet {
+
+    /**
+     * Provides logging to the console and to a file.
+     */
+    public static final Logger logger = LogManager.getLogger(SetStatusInTrash.class);
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   db:
-    image: mysql:latest
+    image: mysql:8.0.31-debian
     container_name: alexej_krawez_todo_db
     volumes:
       - ./src/main/resources/1_CREATE_USERS_TABLE.sql:/docker-entrypoint-initdb.d/1_CREATE_USERS_TABLE.sql
