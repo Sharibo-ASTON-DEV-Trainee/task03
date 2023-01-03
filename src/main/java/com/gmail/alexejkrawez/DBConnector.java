@@ -92,6 +92,13 @@ public class DBConnector {
 
     }
 
+    /**
+     * Checks if there is an active connection to the database. If there is
+     * no active connection, initializes its creation.
+     * Lazy singleton.
+     *
+     * @return instance of an active connection to the database instead of reconnecting.
+     */
     public static DBConnector getInstance() {
         if (instance == null) {
             synchronized (DBConnector.class) {
@@ -154,6 +161,12 @@ public class DBConnector {
         return connection;
     }
 
+    /**
+     * Used in conjunction with the getInstance() method.
+     * Returns an active database connection.
+     *
+     * @return an active database connection.
+     */
     public Connection getConnection() {
         return connection;
     }
@@ -179,7 +192,13 @@ public class DBConnector {
         return false;
     }
 
-    protected void closeConnection() throws SQLException {
+    /**
+     * Used in conjunction with the getInstance() method.
+     * Initiates closing an active database connection.
+     *
+     * @throws SQLException if a database access error occurs
+     */
+    public void closeConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
