@@ -1,10 +1,13 @@
 package com.gmail.alexejkrawez.entities;
 
+import com.gmail.alexejkrawez.DBConnector;
 import com.gmail.alexejkrawez.model.Note;
 import com.gmail.alexejkrawez.model.User;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +18,15 @@ class UserDAOTest extends DBContainer {
     @Override
     public void overwriteURL() {
         super.overwriteURL();
+    }
+
+    @AfterAll
+    public static void closeConnection() {
+        try {
+            DBConnector.getInstance().closeConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
